@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Link } from 'react-router-native';
 
 import Text from './Text';
 import theme from '../theme';
+import useSignIn from '../hooks/useSignIn';
 
 const styles = StyleSheet.create({
   tabs: {
@@ -18,6 +19,10 @@ const styles = StyleSheet.create({
 });
 
 const AppBarTab = () => {
+  const { signOut, getUser } = useSignIn();
+
+  const user = getUser();
+
   return (
     <View style={styles.tabs}>
       <Link to="/">
@@ -25,11 +30,19 @@ const AppBarTab = () => {
           Repositories
         </Text>
       </Link>
-      <Link to="/signin">
-        <Text fontWeight="bold" style={styles.tab}>
-          Sign in
-        </Text>
-      </Link>
+      {!user ? (
+        <Link to="/signin">
+          <Text fontWeight="bold" style={styles.tab}>
+            Sign in
+          </Text>
+        </Link>
+      ) : (
+        <Pressable onPress={signOut}>
+          <Text fontWeight="bold" style={styles.tab}>
+            Sign out
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 };
