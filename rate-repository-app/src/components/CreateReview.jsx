@@ -7,16 +7,24 @@ import * as yup from 'yup';
 import Text from './Text';
 import FormikTextInput from './FormikTextInput';
 import theme from '../theme';
-import useSignIn from '../hooks/useSignIn';
+import useReview from '../hooks/useReview';
 
 const initialValues = {
-  username: '',
-  password: '',
+  repositoryName: '',
+  ownerName: '',
+  rating: '',
+  text: '',
 };
 
 const validationSchema = yup.object().shape({
-  username: yup.string().required('Username is required.'),
-  password: yup.string().required('Password is required.'),
+  repositoryName: yup.string().required('Repository name is required.'),
+  ownerName: yup.string().required('Repository owner name is required.'),
+  rating: yup
+    .number()
+    .min(0)
+    .max(100)
+    .integer('The rating score must be a whole number')
+    .required('Rating is required.'),
 });
 
 const styles = StyleSheet.create({
@@ -47,25 +55,33 @@ export const SignInForm = ({ onSubmit }) => {
     <View style={styles.container}>
       <FormikTextInput
         style={styles.textBox}
-        name="username"
-        placeholder="Username"
-        testID="usernameField"
+        name="ownerName"
+        placeholder="Repository owner name"
       />
       <FormikTextInput
         style={styles.textBox}
-        secureTextEntry={true}
-        name="password"
-        placeholder="Password"
-        testID="passwordField"
+        name="repositoryName"
+        placeholder="Repository name"
+      />
+      <FormikTextInput
+        style={styles.textBox}
+        name="rating"
+        placeholder="Rating between 0 and 100"
+      />
+      <FormikTextInput
+        style={styles.textBox}
+        name="text"
+        placeholder="Review"
+        multiline
       />
       <Pressable onPress={onSubmit} testID="submitButton">
-        <Text style={styles.loginButton}>Sign in</Text>
+        <Text style={styles.loginButton}>Create a review</Text>
       </Pressable>
     </View>
   );
 };
 
-export const SignInContainer = ({
+export const CreateReviewContainer = ({
   initialValues,
   onSubmit,
   validationSchema,
@@ -81,23 +97,28 @@ export const SignInContainer = ({
   );
 };
 
-const SignIn = () => {
-  const { signIn } = useSignIn();
+const CreateReview = () => {
+  const { createReview } = useReview();
   const history = useHistory();
 
   const onSubmit = async (values) => {
-    const { username, password } = values;
+    const { repositoryName, ownerName, rating, text } = values;
 
     try {
-      await signIn({ username, password });
-      history.push('/');
+      const repoId = await createReview({
+        repositoryName,
+        ownerName,
+        rating,
+        text,
+      });
+      history.push(`/repo/${repoId}`);
     } catch (e) {
       console.log(e);
     }
   };
 
   return (
-    <SignInContainer
+    <CreateReviewContainer
       initialValues={initialValues}
       onSubmit={onSubmit}
       validationSchema={validationSchema}
@@ -105,4 +126,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default CreateReview;

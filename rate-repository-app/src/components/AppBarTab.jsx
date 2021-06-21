@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
-import { Link } from 'react-router-native';
+import { useHistory, Link } from 'react-router-native';
 
 import Text from './Text';
 import theme from '../theme';
@@ -19,8 +19,13 @@ const styles = StyleSheet.create({
 });
 
 const AppBarTab = () => {
+  const history = useHistory();
   const { signOut, getUser } = useSignIn();
 
+  const handleSignOut = async () => {
+    await signOut();
+    history.push('/');
+  };
   const user = getUser();
 
   return (
@@ -31,17 +36,36 @@ const AppBarTab = () => {
         </Text>
       </Link>
       {!user ? (
-        <Link to="/signin">
-          <Text fontWeight="bold" style={styles.tab}>
-            Sign in
-          </Text>
-        </Link>
+        <>
+          <Link to="/signin">
+            <Text fontWeight="bold" style={styles.tab}>
+              Sign in
+            </Text>
+          </Link>
+          <Link to="/signup">
+            <Text fontWeight="bold" style={styles.tab}>
+              Sign up
+            </Text>
+          </Link>
+        </>
       ) : (
-        <Pressable onPress={signOut}>
-          <Text fontWeight="bold" style={styles.tab}>
-            Sign out
-          </Text>
-        </Pressable>
+        <>
+          <Link to="/review">
+            <Text fontWeight="bold" style={styles.tab}>
+              Create a review
+            </Text>
+          </Link>
+          <Link to="/my_review">
+            <Text fontWeight="bold" style={styles.tab}>
+              My reviews
+            </Text>
+          </Link>
+          <Pressable onPress={handleSignOut}>
+            <Text fontWeight="bold" style={styles.tab}>
+              Sign out
+            </Text>
+          </Pressable>
+        </>
       )}
     </View>
   );
